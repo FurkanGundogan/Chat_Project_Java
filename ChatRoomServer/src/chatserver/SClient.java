@@ -6,6 +6,7 @@
 package chatserver;
 
 import chatmsg.Message;
+import chatmsg.PrivateMsg;
 import static chatmsg.Message.Message_Type.Selected;
 import java.io.EOFException;
 import java.io.IOException;
@@ -105,6 +106,9 @@ public class SClient {
                             //gelen global mesaj metni tüm kullanıcılara gider
                             Server.sendGlobal(received);
                             break;
+                        case PrivateMsg:
+                            Server.sendPrivate(received);
+                            break;                          
                         case Selected:
                             Server.Send(TheClient.rival, received);
                             break;

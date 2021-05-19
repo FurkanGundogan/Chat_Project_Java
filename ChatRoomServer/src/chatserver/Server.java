@@ -6,8 +6,8 @@
 package chatserver;
 
 import chatmsg.Message;
+import chatmsg.PrivateMsg;
 import java.io.IOException;
-
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -128,6 +128,22 @@ public class Server {
         for (SClient c : Clients) {
             Server.Send(c, msg);
         }
+    }
+    
+    public static void sendPrivate(Message msg){
+        PrivateMsg pmsg=(PrivateMsg)msg.content;
+        
+        for (SClient c : Clients) {
+            if(c.name.equals(pmsg.getTarget())){
+                Server.Send(c, msg);
+                System.out.println(c.name);
+                break; 
+            }
+                 
+        }
+        
+        
+        
     }
 
     // serverdan clietlara mesaj gönderme

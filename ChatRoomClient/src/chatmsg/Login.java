@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import chatclient.Client;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.DefaultListModel;
 
 /**
@@ -30,9 +31,9 @@ public class Login extends javax.swing.JFrame {
     public int RivalSelection = -1;
     //benim seçimim seçim -1 deyse seçilmemiş
     public int myselection = -1;
-
+    HashMap<String, String> myPrivateChats = new HashMap<String, String>();
     Random rand;
-
+    //
     /**
      * Creates new form Game
      */
@@ -72,6 +73,20 @@ public class Login extends javax.swing.JFrame {
     public void updateMyUserList(DefaultListModel dlm) {
         // Aktif kullanıcıların listelenmesi
         list_all_users.setModel(dlm);
+        createNewPrivateChat(dlm);
+    }
+    public void createNewPrivateChat(DefaultListModel dlm){
+        String username=(String)dlm.get(dlm.getSize()-1);
+        if(!myPrivateChats.containsKey(username)){
+             myPrivateChats.put(username, "Baslangic");
+        }
+       
+    }
+    public void privateMsgReceived(PrivateMsg pmsg){
+        myPrivateChats.put(pmsg.getSender(), myPrivateChats.get(pmsg.getSender())+"\n"+pmsg.getSender()+": "+pmsg.getContent());
+        txt_private_chat.setText(myPrivateChats.get(pmsg.getSender()));
+        lbltest.setText(pmsg.getContent());
+               
     }
 
     public void Reset() {
@@ -83,6 +98,8 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
         txt_myusername = new javax.swing.JTextField();
         btn_connect = new javax.swing.JButton();
         pnl_gamer1 = new javax.swing.JPanel();
@@ -94,6 +111,19 @@ public class Login extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btn_dc = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        btn_send_private = new javax.swing.JButton();
+        txt_msg_private = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        txt_private_chat = new java.awt.TextArea();
+        jButton1 = new javax.swing.JButton();
+        lbltest = new java.awt.Label();
+
+        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane3.setViewportView(jList1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -129,7 +159,7 @@ public class Login extends javax.swing.JFrame {
         getContentPane().add(btn_send_message, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 390, 170, -1));
 
         txt_global_chat.setEditable(false);
-        getContentPane().add(txt_global_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 470, 230));
+        getContentPane().add(txt_global_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 460, 220));
 
         txt_msg_global.setText("Selam");
         getContentPane().add(txt_msg_global, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 350, 470, 30));
@@ -159,6 +189,30 @@ public class Login extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setText("Online Users");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 80, -1, -1));
+
+        btn_send_private.setText("Send");
+        btn_send_private.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_send_privateActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_send_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 330, 100, 30));
+
+        txt_msg_private.setText("Ozel Mesaj");
+        getContentPane().add(txt_msg_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 290, 260, 30));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setText("Private Chat");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 80, -1, -1));
+
+        txt_private_chat.setEditable(false);
+        getContentPane().add(txt_private_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 110, 260, 170));
+
+        jButton1.setText("jButton1");
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 160, -1, -1));
+
+        lbltest.setText("label1");
+        getContentPane().add(lbltest, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 30, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -214,6 +268,25 @@ public class Login extends javax.swing.JFrame {
         txt_myusername.setEnabled(true);
     }//GEN-LAST:event_btn_dcActionPerformed
 
+    private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
+        // TODO add your handling code here:
+        //txt_private_chat.setText(txt_private_chat.getText()+"\n"+txt_myusername.getText()+": "+txt_msg_private.getText());
+        String senderUsername = txt_myusername.getText();
+        String targetUsername=list_all_users.getSelectedValue();
+        String content=txt_msg_private.getText();
+        PrivateMsg pmsg=new PrivateMsg(senderUsername, targetUsername, content);
+        myPrivateChats.put(targetUsername, myPrivateChats.get(targetUsername)+"\n"+senderUsername+": "+content);
+        txt_private_chat.setText(myPrivateChats.get(targetUsername));
+        txt_msg_private.setText("");
+        
+        Message msg = new Message(Message.Message_Type.PrivateMsg);              
+        msg.content=pmsg;
+        Client.Send(msg);
+        
+        
+            
+    }//GEN-LAST:event_btn_send_privateActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -256,14 +329,22 @@ public class Login extends javax.swing.JFrame {
     public javax.swing.JButton btn_connect;
     private javax.swing.JButton btn_dc;
     public javax.swing.JButton btn_send_message;
+    private javax.swing.JButton btn_send_private;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private java.awt.Label lbltest;
     private javax.swing.JList<String> list_all_users;
     private javax.swing.JPanel pnl_gamer1;
     public java.awt.TextArea txt_global_chat;
     private javax.swing.JTextField txt_msg_global;
+    private javax.swing.JTextField txt_msg_private;
     public javax.swing.JTextField txt_myusername;
+    public java.awt.TextArea txt_private_chat;
     // End of variables declaration//GEN-END:variables
 }

@@ -12,7 +12,7 @@ package chatmsg;
 public class Message implements java.io.Serializable {
 
     public static enum Message_Type {
-        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename
+        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename, PrivateMsg
     }
 
     public Message_Type type;

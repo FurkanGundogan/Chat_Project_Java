@@ -6,6 +6,7 @@
 package chatclient;
 
 import chatmsg.Message;
+import chatmsg.PrivateMsg;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -52,6 +53,9 @@ class Listen extends Thread {
                     case UpdateUserList:
                         // Gelen dlm ile mevcut user listesini günceller
                         Login.ThisGame.updateMyUserList((DefaultListModel) received.content);
+                        break;
+                    case PrivateMsg:
+                        Login.ThisGame. privateMsgReceived((PrivateMsg)received.content);
                         break;
                     case Rename:
                         // Girdiği isim bulunduysa, kendisine yeni ismi gönderilir, o da username kısmını günceller
