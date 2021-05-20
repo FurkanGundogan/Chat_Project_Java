@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Furu/Desktop/Network_Project2/Chat_Project_Java/ChatRoomServer/src/chatserver/SClient.java</file>
+            <file>file:/C:/Users/Furu/Desktop/Network_Project2/Chat_Project_Java/ChatRoomServer/src/chatserver/ChatServer.java</file>
+            <file>file:/C:/Users/Furu/Desktop/Network_Project2/Chat_Project_Java/ChatRoomServer/src/chatmsg/Message.java</file>
+            <file>file:/C:/Users/Furu/Desktop/Network_Project2/Chat_Project_Java/ChatRoomServer/src/chatserver/Server.java</file>
+            <file>file:/C:/Users/Furu/Desktop/Network_Project2/Chat_Project_Java/ChatRoomServer/src/chatmsg/PrivateMsg.java</file>
+        </group>
     </open-files>
 </project-private>
