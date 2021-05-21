@@ -12,7 +12,7 @@ package chatmsg;
 
 public class Message implements java.io.Serializable {
     //mesaj tipleri enum 
-    public static enum Message_Type {None, Name, Disconnect,RivalConnected, Text, Selected, Bitis,Start,UpdateUserList,Rename, PrivateMsg}
+    public static enum Message_Type {None, Name, Disconnect,RivalConnected, Text, Selected, Bitis,Start,UpdateUserList,Rename, PrivateMsg,CreateNewRoom,NewRoom,SendAllRooms,RoomNameExist,CloseCreation}
     //mesajın tipi
     public Message_Type type;
     //mesajın içeriği obje tipinde ki istenilen tip içerik yüklenebilsin

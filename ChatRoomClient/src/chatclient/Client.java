@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static chatclient.Client.sInput;
 import chatmsg.Login;
+import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 
 /**
@@ -56,6 +57,16 @@ class Listen extends Thread {
                         break;
                     case PrivateMsg:
                         Login.ThisGame. privateMsgReceived((PrivateMsg)received.content);
+                        break;
+                    case SendAllRooms:                        
+                        Login.ThisGame.GetAllRooms((ArrayList<String>)received.content);                       
+                        break;
+                    case RoomNameExist:
+                        Login.ThisGame.cr.lbl_Hata.setText((String)received.content);
+                        Login.ThisGame.cr.lbl_Hata.setVisible(true);
+                        break;
+                    case CloseCreation:
+                        Login.ThisGame.cr.dispose();
                         break;
                     case Rename:
                         // Girdiği isim bulunduysa, kendisine yeni ismi gönderilir, o da username kısmını günceller

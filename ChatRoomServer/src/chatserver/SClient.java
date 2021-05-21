@@ -90,7 +90,7 @@ public class SClient {
                             TheClient.name = uname;
                             System.out.println(TheClient.name + "is connected.");
                             Server.sendUpdateUserList();
-
+                            Server.SendAllRooms();
                             TheClient.pairThread.start();
                             break;
                         case Disconnect:
@@ -108,7 +108,10 @@ public class SClient {
                             break;
                         case PrivateMsg:
                             Server.sendPrivate(received);
-                            break;                          
+                            break;
+                        case CreateNewRoom:
+                            Server.addNewRoom(received);
+                            break; 
                         case Selected:
                             Server.Send(TheClient.rival, received);
                             break;

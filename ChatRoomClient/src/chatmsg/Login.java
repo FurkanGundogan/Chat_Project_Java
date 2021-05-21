@@ -13,9 +13,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import chatclient.Client;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
 
 /**
  *
@@ -25,8 +35,10 @@ public class Login extends javax.swing.JFrame {
 
     //framedeki komponentlere erişim için satatik oyun değişkeni
     public static Login ThisGame;
+    public CreateRoom cr;
     //ekrandaki resim değişimi için timer yerine thread
     public Thread tmr_slider;
+      public Thread roomCreation;
     //karşı tarafın seçimi seçim -1 deyse seçilmemiş
     public int RivalSelection = -1;
     //benim seçimim seçim -1 deyse seçilmemiş
@@ -44,7 +56,9 @@ public class Login extends javax.swing.JFrame {
         initComponents();
         ThisGame = this;
         rand = new Random();
-
+        lbltest.setVisible(false);
+        lbltest2.setVisible(false);
+        roomListChoice.add("Test");
         // resimleri döndürmek için tread aynı zamanda oyun bitiminide takip ediyor
         tmr_slider = new Thread(() -> {
             //soket bağlıysa dönsün
@@ -119,6 +133,14 @@ public class Login extends javax.swing.JFrame {
         }
 
     }
+    public void GetAllRooms(ArrayList<String> list){
+        roomListChoice.removeAll();
+        for (String listitem : list) {
+            roomListChoice.add(listitem);
+        }
+        
+    }
+    
 
     public void Reset() {
 
@@ -131,6 +153,10 @@ public class Login extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane3 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
         txt_myusername = new javax.swing.JTextField();
         btn_connect = new javax.swing.JButton();
         pnl_gamer1 = new javax.swing.JPanel();
@@ -146,9 +172,12 @@ public class Login extends javax.swing.JFrame {
         txt_msg_private = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txt_private_chat = new java.awt.TextArea();
-        jButton1 = new javax.swing.JButton();
+        btn_enterRoom = new javax.swing.JButton();
         lbltest = new java.awt.Label();
         lbltest2 = new java.awt.Label();
+        roomListChoice = new java.awt.Choice();
+        jLabel4 = new javax.swing.JLabel();
+        btn_newRoom = new javax.swing.JButton();
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -156,6 +185,13 @@ public class Login extends javax.swing.JFrame {
             public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane3.setViewportView(jList1);
+
+        jMenu1.setText("jMenu1");
+
+        jMenu2.setText("jMenu2");
+
+        jRadioButtonMenuItem1.setSelected(true);
+        jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -181,20 +217,22 @@ public class Login extends javax.swing.JFrame {
         pnl_gamer1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         getContentPane().add(pnl_gamer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, 259));
 
-        btn_send_message.setText("Send");
+        btn_send_message.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btn_send_message.setForeground(new java.awt.Color(0, 204, 51));
+        btn_send_message.setText(">");
         btn_send_message.setEnabled(false);
         btn_send_message.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_send_messageActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_send_message, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 390, 170, -1));
+        getContentPane().add(btn_send_message, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 340, 60, 30));
 
         txt_global_chat.setEditable(false);
-        getContentPane().add(txt_global_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 460, 220));
+        getContentPane().add(txt_global_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 370, 220));
 
         txt_msg_global.setText("Selam");
-        getContentPane().add(txt_msg_global, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 350, 470, 30));
+        getContentPane().add(txt_msg_global, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 340, 300, 30));
 
         list_all_users.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -208,11 +246,11 @@ public class Login extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(list_all_users);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 110, 210, 240));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 110, 210, 220));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("GLOBAL CHAT");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 80, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, -1, -1));
 
         btn_dc.setText("Disconnect");
         btn_dc.setEnabled(false);
@@ -225,40 +263,59 @@ public class Login extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setText("Online Users");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 80, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 80, -1, -1));
 
-        btn_send_private.setText("Send");
+        btn_send_private.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btn_send_private.setForeground(new java.awt.Color(0, 204, 51));
+        btn_send_private.setText(">");
         btn_send_private.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_send_privateActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_send_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 330, 100, 30));
+        getContentPane().add(btn_send_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 290, 50, 30));
 
         txt_msg_private.setText("Ozel Mesaj");
-        getContentPane().add(txt_msg_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 290, 260, 30));
+        getContentPane().add(txt_msg_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 290, 200, 30));
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel3.setText("Private Chat");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 80, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 80, -1, -1));
 
         txt_private_chat.setEditable(false);
-        getContentPane().add(txt_private_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 110, 260, 170));
+        getContentPane().add(txt_private_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 110, 260, 170));
 
-        jButton1.setText("jButton1");
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1180, 150, -1, -1));
+        btn_enterRoom.setText("Enter");
+        btn_enterRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_enterRoomActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_enterRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 150, -1, -1));
 
         lbltest.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
         lbltest.setForeground(new java.awt.Color(255, 51, 51));
         lbltest.setText("Usename");
-        lbltest.setVisible(false);
-        getContentPane().add(lbltest, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, 260, -1));
+        getContentPane().add(lbltest, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 30, 260, -1));
 
         lbltest2.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
         lbltest2.setForeground(new java.awt.Color(255, 51, 51));
         lbltest2.setText("send you a private message.");
-        lbltest2.setVisible(false);
-        getContentPane().add(lbltest2, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 50, 260, -1));
+        getContentPane().add(lbltest2, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 50, 260, -1));
+        getContentPane().add(roomListChoice, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 110, 130, 30));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel4.setText("Rooms");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 90, -1, -1));
+
+        btn_newRoom.setText("New");
+        btn_newRoom.setEnabled(false);
+        btn_newRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_newRoomActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_newRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 190, 60, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -270,6 +327,7 @@ public class Login extends javax.swing.JFrame {
         txt_myusername.setEnabled(false);
         btn_send_message.setEnabled(true);
         btn_dc.setEnabled(true);
+        btn_newRoom.setEnabled(true);
     }//GEN-LAST:event_btn_connectActionPerformed
 
     private void btn_send_messageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_messageActionPerformed
@@ -312,6 +370,7 @@ public class Login extends javax.swing.JFrame {
         btn_send_message.setEnabled(false);
         btn_connect.setEnabled(true);
         txt_myusername.setEnabled(true);
+        btn_newRoom.setEnabled(false);
     }//GEN-LAST:event_btn_dcActionPerformed
 
     private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
@@ -362,6 +421,29 @@ public class Login extends javax.swing.JFrame {
 
     }//GEN-LAST:event_list_all_usersValueChanged
 
+    private void btn_newRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_newRoomActionPerformed
+        // TODO add your handling code here:
+       cr=new CreateRoom();
+       ArrayList<String> roomnames=new ArrayList<String>();
+        for (int i = 0; i < roomListChoice.getItemCount(); i++) {
+            roomnames.add( roomListChoice.getItem(i));
+        }
+       
+       cr.username=txt_myusername.getText(); 
+       cr.rNames=roomnames;
+       cr.setVisible(true);
+       
+       
+       
+       
+       // String roomName=JOptionPane.showInputDialog(newRoomFrame,"Enter Room Name","Create New Room",3);
+        
+    }//GEN-LAST:event_btn_newRoomActionPerformed
+
+    private void btn_enterRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enterRoomActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_enterRoomActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -403,20 +485,27 @@ public class Login extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton btn_connect;
     private javax.swing.JButton btn_dc;
+    private javax.swing.JButton btn_enterRoom;
+    private javax.swing.JButton btn_newRoom;
     public javax.swing.JButton btn_send_message;
     private javax.swing.JButton btn_send_private;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JList<String> jList1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private java.awt.Label lbltest;
     private java.awt.Label lbltest2;
     private javax.swing.JList<String> list_all_users;
     private javax.swing.JPanel pnl_gamer1;
+    public java.awt.Choice roomListChoice;
     public java.awt.TextArea txt_global_chat;
     private javax.swing.JTextField txt_msg_global;
     private javax.swing.JTextField txt_msg_private;

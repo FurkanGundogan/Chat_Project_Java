@@ -62,7 +62,7 @@ public class Server {
     //public static PairingThread pairThread;
 
     public static ArrayList<SClient> Clients = new ArrayList<>();
-
+    public static ArrayList<ChatRoom> chatRooms=new ArrayList<>();
     //semafor nesnesi
     public static Semaphore pairTwo = new Semaphore(1, true);
 
@@ -145,7 +145,64 @@ public class Server {
         
         
     }
-
+    public static void addNewRoom(Message msg){
+       String roomname= ((ArrayList<String>) msg.content).get(0);
+       String roompass= ((ArrayList<String>) msg.content).get(1);
+       String firstUser= ((ArrayList<String>) msg.content).get(2);
+       
+       boolean containControl=false;
+        for (ChatRoom c : chatRooms) {
+            if(c.name.equals(roomname)){
+                containControl=true;
+                break;
+            }
+        }
+       
+        if(!containControl){
+             chatRooms.add(new ChatRoom(roomname, roompass, firstUser));
+             SendAllRooms();
+             SendCloseCreationMsg(firstUser);
+             
+        }else{
+            Message newmsg = new Message(Message.Message_Type.RoomNameExist);
+            String text="Room name is already exist";
+            newmsg.content = text;
+            
+            for (SClient c : Clients) {
+                if(c.name.equals(firstUser)){
+                     Server.Send(c, newmsg);
+                     break;
+                }
+            }
+            
+           
+        }
+    }
+    public static void SendAllRooms(){
+        
+        
+        ArrayList<String> allroomnames= new ArrayList<>();
+        
+        for (ChatRoom c : chatRooms) {
+            allroomnames.add(c.name);
+        }
+        
+        Message newmsg = new Message(Message.Message_Type.SendAllRooms);
+        newmsg.content = allroomnames;
+        for (SClient c : Clients) {
+            Server.Send(c, newmsg);
+        }
+    }
+    public static void SendCloseCreationMsg(String name){
+         Message newmsg = new Message(Message.Message_Type.CloseCreation);
+         for (SClient c : Clients) {
+             if(c.name.equals(name)){
+                 Server.Send(c, newmsg);
+                 break;
+             }
+            
+        }
+    }
     // serverdan clietlara mesaj gönderme
     //clieti alıyor ve mesaj olluyor
     public static void Send(SClient cl, Message msg) {
