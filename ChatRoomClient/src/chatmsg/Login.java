@@ -31,9 +31,10 @@ public class Login extends javax.swing.JFrame {
     public int RivalSelection = -1;
     //benim seçimim seçim -1 deyse seçilmemiş
     public int myselection = -1;
-    public String selectedUserForPrvChat="";
+    public String selectedUserForPrvChat = "";
     HashMap<String, String> myPrivateChats = new HashMap<String, String>();
     Random rand;
+
     //
     /**
      * Creates new form Game
@@ -73,42 +74,50 @@ public class Login extends javax.swing.JFrame {
 
     public void updateMyUserList(DefaultListModel dlm) {
         // Aktif kullanıcıların listelenmesi   
-        String selected=list_all_users.getSelectedValue();
-        list_all_users.setModel(dlm);  
-        boolean isChanged=true;
-        if(selected!=null){
-        for (int i = 0; i < dlm.size(); i++) {
-            String uname=(String)dlm.get(i);
-             
-            if(selected.equals(uname)){
-                list_all_users.setSelectedIndex(i);
-               System.out.println(selected+"-"+uname+":"+i);
-                isChanged=false;
-                break;
+        String selected = list_all_users.getSelectedValue();
+        list_all_users.setModel(dlm);
+        boolean isChanged = true;
+        if (selected != null) {
+            for (int i = 0; i < dlm.size(); i++) {
+                String uname = (String) dlm.get(i);
+
+                if (selected.equals(uname)) {
+                    list_all_users.setSelectedIndex(i);
+                    System.out.println(selected + "-" + uname + ":" + i);
+                    isChanged = false;
+                    break;
+                }
             }
-        }}
-        if(isChanged)list_all_users.setSelectedIndex(0);
+        }
+        if (isChanged) {
+            list_all_users.setSelectedIndex(0);
+        }
         createNewPrivateChat(dlm);
     }
-    public void createNewPrivateChat(DefaultListModel dlm){
-        String username=(String)dlm.get(dlm.getSize()-1);
-        if(!myPrivateChats.containsKey(username)){
-             myPrivateChats.put(username, "");
+
+    public void createNewPrivateChat(DefaultListModel dlm) {
+        String username = (String) dlm.get(dlm.getSize() - 1);
+        if (!myPrivateChats.containsKey(username)) {
+            myPrivateChats.put(username, "");
         }
-       
+
     }
-    public void privateMsgReceived(PrivateMsg pmsg){
-        String oldMsgs="";
-        if(myPrivateChats.get(pmsg.getSender())!=null)oldMsgs=myPrivateChats.get(pmsg.getSender());
-        
-        
-        myPrivateChats.put(pmsg.getSender(), oldMsgs+pmsg.getSender()+": "+pmsg.getContent()+"\n");
-        if(pmsg.getSender().equals(list_all_users.getSelectedValue())){
-            txt_private_chat.setText(myPrivateChats.get(pmsg.getSender()));
+
+    public void privateMsgReceived(PrivateMsg pmsg) {
+        String oldMsgs = "";
+        if (myPrivateChats.get(pmsg.getSender()) != null) {
+            oldMsgs = myPrivateChats.get(pmsg.getSender());
         }
-        
-        lbltest.setText(pmsg.getContent());
-               
+
+        myPrivateChats.put(pmsg.getSender(), oldMsgs + pmsg.getSender() + ": " + pmsg.getContent() + "\n");
+        if (pmsg.getSender().equals(list_all_users.getSelectedValue())) {
+            txt_private_chat.setText(myPrivateChats.get(pmsg.getSender()));
+        } else {
+            lbltest.setText(pmsg.getSender());
+            lbltest.setVisible(true);
+            lbltest2.setVisible(true);
+        }
+
     }
 
     public void Reset() {
@@ -139,6 +148,7 @@ public class Login extends javax.swing.JFrame {
         txt_private_chat = new java.awt.TextArea();
         jButton1 = new javax.swing.JButton();
         lbltest = new java.awt.Label();
+        lbltest2 = new java.awt.Label();
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -155,8 +165,8 @@ public class Login extends javax.swing.JFrame {
         });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txt_myusername.setText("Name");
-        getContentPane().add(txt_myusername, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 73, -1));
+        txt_myusername.setText("Username");
+        getContentPane().add(txt_myusername, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 140, -1));
 
         btn_connect.setText("Connect");
         btn_connect.addActionListener(new java.awt.event.ActionListener() {
@@ -164,7 +174,7 @@ public class Login extends javax.swing.JFrame {
                 btn_connectActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_connect, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 30, 160, -1));
+        getContentPane().add(btn_connect, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 90, -1));
 
         pnl_gamer1.setBackground(new java.awt.Color(255, 153, 153));
         pnl_gamer1.setForeground(new java.awt.Color(51, 255, 0));
@@ -211,7 +221,7 @@ public class Login extends javax.swing.JFrame {
                 btn_dcActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_dc, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 180, -1));
+        getContentPane().add(btn_dc, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 30, 110, -1));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel2.setText("Online Users");
@@ -223,7 +233,7 @@ public class Login extends javax.swing.JFrame {
                 btn_send_privateActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_send_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 330, 100, 30));
+        getContentPane().add(btn_send_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 330, 100, 30));
 
         txt_msg_private.setText("Ozel Mesaj");
         getContentPane().add(txt_msg_private, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 290, 260, 30));
@@ -238,8 +248,17 @@ public class Login extends javax.swing.JFrame {
         jButton1.setText("jButton1");
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1180, 150, -1, -1));
 
-        lbltest.setText("label1");
-        getContentPane().add(lbltest, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 30, -1, -1));
+        lbltest.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
+        lbltest.setForeground(new java.awt.Color(255, 51, 51));
+        lbltest.setText("Usename");
+        lbltest.setVisible(false);
+        getContentPane().add(lbltest, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, 260, -1));
+
+        lbltest2.setFont(new java.awt.Font("Calibri", 2, 14)); // NOI18N
+        lbltest2.setForeground(new java.awt.Color(255, 51, 51));
+        lbltest2.setText("send you a private message.");
+        lbltest2.setVisible(false);
+        getContentPane().add(lbltest2, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 50, 260, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -297,43 +316,50 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
         // TODO add your handling code here:
-        
+
         String senderUsername = txt_myusername.getText();
-        String targetUsername=list_all_users.getSelectedValue();
-        String content=txt_msg_private.getText();
-        PrivateMsg pmsg=new PrivateMsg(senderUsername, targetUsername, content);
-        String oldMsgs="";
-        if(myPrivateChats.get(pmsg.getTarget())!=null)oldMsgs=myPrivateChats.get(targetUsername);
-        
-        myPrivateChats.put(targetUsername, oldMsgs+senderUsername+": "+content+"\n");
+        String targetUsername = list_all_users.getSelectedValue();
+        String content = txt_msg_private.getText();
+        PrivateMsg pmsg = new PrivateMsg(senderUsername, targetUsername, content);
+        String oldMsgs = "";
+        if (myPrivateChats.get(pmsg.getTarget()) != null) {
+            oldMsgs = myPrivateChats.get(targetUsername);
+        }
+
+        myPrivateChats.put(targetUsername, oldMsgs + senderUsername + ": " + content + "\n");
         txt_private_chat.setText(myPrivateChats.get(targetUsername));
         txt_msg_private.setText("");
-        
-        Message msg = new Message(Message.Message_Type.PrivateMsg);              
-        msg.content=pmsg;
+
+        Message msg = new Message(Message.Message_Type.PrivateMsg);
+        msg.content = pmsg;
         Client.Send(msg);
-        
-        
-            
+
+
     }//GEN-LAST:event_btn_send_privateActionPerformed
 
     private void list_all_usersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_list_all_usersValueChanged
         // TODO add your handling code here:
-        
-        selectedUserForPrvChat=list_all_users.getSelectedValue();
-        if(selectedUserForPrvChat!=null && selectedUserForPrvChat.equals(txt_myusername.getText())){
-        txt_private_chat.setText("");
-        txt_private_chat.setEnabled(false);
-        txt_msg_private.setEnabled(false);
-        btn_send_private.setEnabled(false);
-        }else{
-        txt_private_chat.setText(myPrivateChats.get(selectedUserForPrvChat));
-        txt_private_chat.setEnabled(true);
-        txt_msg_private.setEnabled(true);
-        btn_send_private.setEnabled(true);
+
+        selectedUserForPrvChat = list_all_users.getSelectedValue();
+        if (selectedUserForPrvChat != null && selectedUserForPrvChat.equals(txt_myusername.getText())) {
+            txt_private_chat.setText("");
+            txt_private_chat.setEnabled(false);
+            txt_msg_private.setEnabled(false);
+            btn_send_private.setEnabled(false);
+        } else {
+            txt_private_chat.setText(myPrivateChats.get(selectedUserForPrvChat));
+            txt_private_chat.setEnabled(true);
+            txt_msg_private.setEnabled(true);
+            btn_send_private.setEnabled(true);
+
+            if (selectedUserForPrvChat!=null && selectedUserForPrvChat.equals(lbltest.getText())) {
+
+                lbltest.setVisible(false);
+                lbltest2.setVisible(false);
+            }
         }
-        
-        
+
+
     }//GEN-LAST:event_list_all_usersValueChanged
 
     /**
@@ -388,6 +414,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private java.awt.Label lbltest;
+    private java.awt.Label lbltest2;
     private javax.swing.JList<String> list_all_users;
     private javax.swing.JPanel pnl_gamer1;
     public java.awt.TextArea txt_global_chat;
