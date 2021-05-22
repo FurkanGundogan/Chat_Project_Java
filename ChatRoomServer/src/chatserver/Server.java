@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +64,7 @@ public class Server {
     //public static PairingThread pairThread;
 
     public static ArrayList<SClient> Clients = new ArrayList<>();
-    public static ArrayList<ChatRoom> chatRooms=new ArrayList<>();
+    public static ArrayList<ChatRoom> chatRooms = new ArrayList<>();
     //semafor nesnesi
     public static Semaphore pairTwo = new Semaphore(1, true);
 
@@ -129,80 +131,253 @@ public class Server {
             Server.Send(c, msg);
         }
     }
-    
-    public static void sendPrivate(Message msg){
-        PrivateMsg pmsg=(PrivateMsg)msg.content;
-        
+
+    public static void sendPrivate(Message msg) {
+        PrivateMsg pmsg = (PrivateMsg) msg.content;
+
         for (SClient c : Clients) {
-            if(c.name.equals(pmsg.getTarget())){
+            if (c.name.equals(pmsg.getTarget())) {
                 Server.Send(c, msg);
                 System.out.println(c.name);
-                break; 
+                break;
             }
-                 
+
         }
-        
-        
-        
+
     }
-    public static void addNewRoom(Message msg){
-       String roomname= ((ArrayList<String>) msg.content).get(0);
-       String roompass= ((ArrayList<String>) msg.content).get(1);
-       String firstUser= ((ArrayList<String>) msg.content).get(2);
-       
-       boolean containControl=false;
+
+    public static void addNewRoom(Message msg) {
+        String roomname = ((ArrayList<String>) msg.content).get(0);
+        String roompass = ((ArrayList<String>) msg.content).get(1);
+        String firstUser = ((ArrayList<String>) msg.content).get(2);
+
+        boolean containControl = false;
         for (ChatRoom c : chatRooms) {
-            if(c.name.equals(roomname)){
-                containControl=true;
+            if (c.name.equals(roomname)) {
+                containControl = true;
                 break;
             }
         }
-       
-        if(!containControl){
-             chatRooms.add(new ChatRoom(roomname, roompass, firstUser));
-             SendAllRooms();
-             SendCloseCreationMsg(firstUser);
-             
-        }else{
+
+        if (!containControl) {
+            ChatRoom r = new ChatRoom(roomname, roompass, firstUser);
+
+            chatRooms.add(r);
+            SendAllRooms();
+            SendCreationCompleteMsg(firstUser, r);
+
+        } else {
             Message newmsg = new Message(Message.Message_Type.RoomNameExist);
-            String text="Room name is already exist";
+            String text = "Room name is already exist";
             newmsg.content = text;
-            
+
             for (SClient c : Clients) {
-                if(c.name.equals(firstUser)){
-                     Server.Send(c, newmsg);
-                     break;
+                if (c.name.equals(firstUser)) {
+                    Server.Send(c, newmsg);
+                    break;
                 }
             }
-            
-           
+
         }
     }
-    public static void SendAllRooms(){
+
+    public static void SendCreationCompleteMsg(String name, ChatRoom r) {
+        Message newmsg = new Message(Message.Message_Type.CompleteCreation);
+        HashMap<String, ArrayList<String>> cnt = new HashMap<String, ArrayList<String>>();
         
-        
-        ArrayList<String> allroomnames= new ArrayList<>();
-        
+        cnt.put(r.name, r.userListOfRoom);
+        newmsg.content = cnt;
+        for (SClient c : Clients) {
+            if (c.name.equals(name)) {
+                Server.Send(c, newmsg);
+                break;
+            }
+
+        }
+    }
+
+    public static void SendAllRooms() {
+
+        ArrayList<String> allroomnames = new ArrayList<>();
+
         for (ChatRoom c : chatRooms) {
             allroomnames.add(c.name);
         }
-        
+
         Message newmsg = new Message(Message.Message_Type.SendAllRooms);
         newmsg.content = allroomnames;
         for (SClient c : Clients) {
             Server.Send(c, newmsg);
         }
     }
-    public static void SendCloseCreationMsg(String name){
-         Message newmsg = new Message(Message.Message_Type.CloseCreation);
-         for (SClient c : Clients) {
-             if(c.name.equals(name)){
-                 Server.Send(c, newmsg);
-                 break;
-             }
-            
+
+    public static void ControlRoomJoin(Message msg) {
+        ArrayList<String> info = (ArrayList<String>) msg.content;
+        String room = info.get(0);
+        String pass = info.get(1);
+        String user = info.get(2);
+
+        int roomIndex = findRoom(room);
+
+        System.out.println("girilen:" + pass + " sifre:" + chatRooms.get(roomIndex).password);
+        if (chatRooms.get(roomIndex).password.equals(pass)) {
+            //accept join
+
+            Server.SendAcceptRoomJoin(user, chatRooms.get(roomIndex).name);
+            //Son giren kullanici icin, eski uyeleri getirililmesi
+            Server.SendLastUserListToJoined(user, chatRooms.get(roomIndex).name, chatRooms.get(roomIndex).userListOfRoom);
+
+            chatRooms.get(roomIndex).userListOfRoom.add(user);
+            Server.SendUpdateChatRoomUsers(chatRooms.get(roomIndex), user);
+
+        } else {
+            SendRejectRoomJoin(user);
+        }
+
+    }
+
+    public static int findRoom(String roomName) {
+        int index = -1;
+
+        for (int i = 0; i < chatRooms.size(); i++) {
+            if (chatRooms.get(i).name.equals(roomName)) {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    public static void SendAcceptRoomJoin(String user, String roomname) {
+
+        for (SClient c : Clients) {
+            if (c.name.equals(user)) {
+                Message newmsg = new Message(Message.Message_Type.PasswordAccepted);
+                ArrayList<String> items = new ArrayList<String>();
+                items.add(user);
+                items.add(roomname);
+                newmsg.content = items;
+                Server.Send(c, newmsg);
+                break;
+            }
+        }
+
+    }
+
+    public static void SendRejectRoomJoin(String user) {
+        for (SClient c : Clients) {
+            if (c.name.equals(user)) {
+                Message newmsg = new Message(Message.Message_Type.PasswordRejected);
+                String text = "Wrong password";
+                newmsg.content = text;
+                Server.Send(c, newmsg);
+                break;
+            }
         }
     }
+
+    public static void SendUpdateChatRoomUsers(ChatRoom cr, String newUser) {
+        for (SClient c : Clients) {
+            if (cr.userListOfRoom.contains(c.name)) {
+                Message newmsg = new Message(Message.Message_Type.UpdateChatRoomUserList);
+                ArrayList<String> elements = new ArrayList<>();
+                elements.add(cr.name);
+                elements.add(newUser);
+                // Burada bir sorun olusmustu
+                // ArrayList burada doğru şekilde bulunmasına rağmen hedefe eksik gidiyordu
+                // Tüm liste yerine, son eklenen kişiyi güncelleyerek sorunu çözdüm.
+
+                newmsg.content = elements;
+                Server.Send(c, newmsg);
+            }
+        }
+    }
+
+    public static void SendRoomMSG(Message msg) {
+
+        ArrayList<String> elements = (ArrayList<String>) msg.content;
+        String room = elements.get(0);
+        String text = elements.get(1);
+
+        for (ChatRoom cr : chatRooms) {
+            if (cr.name.equals(room)) {
+
+                for (SClient c : Clients) {
+
+                    if (cr.userListOfRoom.contains(c.name)) {
+                        Message newmsg = new Message(Message.Message_Type.RoomMSG);
+                        newmsg.content = elements;
+                        Server.Send(c, newmsg);
+                    }
+                }
+
+                break;
+            }
+
+        }
+
+    }
+
+    public static void SendLastUserListToJoined(String user, String roomname, ArrayList<String> userList) {
+        
+        for (SClient c : Clients) {
+            if (c.name.equals(user)) {
+                Message newmsg = new Message(Message.Message_Type.GetOldRoomUsers);
+                ArrayList elements = new ArrayList();
+                elements.add(roomname);
+                ArrayList<String>userListCopy=new ArrayList<String>();
+                for (String u : userList) {
+                    userListCopy.add(u);
+                }
+                elements.add(userListCopy);
+                newmsg.content = elements;
+                Server.Send(c, newmsg);
+                break;
+            }
+        }
+    }
+
+    public static void SendUserLeftRoom(Message msg) {
+        String uname = ((ArrayList<String>) msg.content).get(0);
+         
+        String room = ((ArrayList<String>) msg.content).get(1);
+        int index=findRoom(room);
+        chatRooms.get(index).userListOfRoom.remove(uname);
+        ArrayList<String> arr=chatRooms.get(index).userListOfRoom;
+        ArrayList<String> arr2= new ArrayList<String>();
+        for (String el : arr) {
+            arr2.add(el);
+        }
+        System.out.println("diziyeni: "+arr2);
+        Message newmsg = new Message(Message.Message_Type.RoomUserLeft);
+       
+        
+        ArrayList elements= new ArrayList<>();
+        elements.add(room);
+        elements.add(arr2);
+        
+        newmsg.content=elements;
+        
+        for (SClient c : Clients) {
+            if(chatRooms.get(index).userListOfRoom.contains(c.name)){
+                Server.Send(c, newmsg);
+            }
+        }
+        
+        for (SClient c : Clients) {
+            if(c.name.equals(uname)){
+                Message newmsg2 = new Message(Message.Message_Type.RemoveFromMyRoomList);
+                newmsg2.content=room;
+                Server.Send(c, newmsg2);
+            }
+        }
+        
+        
+        
+
+    }
+
     // serverdan clietlara mesaj gönderme
     //clieti alıyor ve mesaj olluyor
     public static void Send(SClient cl, Message msg) {

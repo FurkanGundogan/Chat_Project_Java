@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import static chatclient.Client.sInput;
 import chatmsg.Login;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.DefaultListModel;
 
 /**
@@ -65,8 +66,32 @@ class Listen extends Thread {
                         Login.ThisGame.cr.lbl_Hata.setText((String)received.content);
                         Login.ThisGame.cr.lbl_Hata.setVisible(true);
                         break;
-                    case CloseCreation:
+                    case CompleteCreation:
                         Login.ThisGame.cr.dispose();
+                        Login.ThisGame.CompleteCreateAndEnter(received);
+                        break;
+                    case PasswordRejected:
+                        Login.ThisGame.enterPass.lbl_wrongpass.setVisible(true);
+                        break;
+                    case PasswordAccepted:
+                        Login.ThisGame.EnterRoom(received);
+                        Login.ThisGame.enterPass.dispose();
+                        break;
+                    case UpdateChatRoomUserList:
+                        //Login.ThisGame.ChatRoomUserListAddNew((HashMap<String,ArrayList<String>>)received.content);
+                        Login.ThisGame.ChatRoomUserListAddNew((ArrayList<String>)received.content);
+                        break;
+                    case RoomMSG:
+                        Login.ThisGame.ChatRoomNewMsg(received);
+                        break;
+                    case GetOldRoomUsers:
+                        Login.ThisGame.ChatSetRoomOldUsers(received);
+                        break;
+                    case RoomUserLeft:
+                        Login.ThisGame.ChatRoomParticipantLeft(received);
+                        break;
+                    case RemoveFromMyRoomList:
+                        Login.ThisGame.DellFromMyChatRooms(received);
                         break;
                     case Rename:
                         // Girdiği isim bulunduysa, kendisine yeni ismi gönderilir, o da username kısmını günceller

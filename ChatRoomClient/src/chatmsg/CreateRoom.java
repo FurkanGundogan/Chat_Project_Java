@@ -125,6 +125,7 @@ public class CreateRoom extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
             if(txtrname.getText().equals("") || txtrpass.getText().equals("")){
             lbl_Hata.setText("Plese fill the blanks");

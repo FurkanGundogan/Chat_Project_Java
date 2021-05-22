@@ -112,6 +112,15 @@ public class SClient {
                         case CreateNewRoom:
                             Server.addNewRoom(received);
                             break; 
+                        case RequestJoinRoom:
+                            Server.ControlRoomJoin(received);
+                            break;
+                        case RoomMSG:
+                            Server.SendRoomMSG(received);
+                            break;
+                        case RoomUserLeft:
+                            Server.SendUserLeftRoom(received);
+                            break;
                         case Selected:
                             Server.Send(TheClient.rival, received);
                             break;

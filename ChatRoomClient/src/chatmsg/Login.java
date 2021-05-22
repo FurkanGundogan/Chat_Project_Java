@@ -13,11 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import chatclient.Client;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -36,9 +38,11 @@ public class Login extends javax.swing.JFrame {
     //framedeki komponentlere erişim için satatik oyun değişkeni
     public static Login ThisGame;
     public CreateRoom cr;
+    public PassInputScreen enterPass;
+    public static ArrayList<Room> myChatRooms;
     //ekrandaki resim değişimi için timer yerine thread
     public Thread tmr_slider;
-      public Thread roomCreation;
+    public Thread roomCreation;
     //karşı tarafın seçimi seçim -1 deyse seçilmemiş
     public int RivalSelection = -1;
     //benim seçimim seçim -1 deyse seçilmemiş
@@ -58,6 +62,7 @@ public class Login extends javax.swing.JFrame {
         rand = new Random();
         lbltest.setVisible(false);
         lbltest2.setVisible(false);
+        myChatRooms = new ArrayList<>();
         roomListChoice.add("Test");
         // resimleri döndürmek için tread aynı zamanda oyun bitiminide takip ediyor
         tmr_slider = new Thread(() -> {
@@ -133,14 +138,114 @@ public class Login extends javax.swing.JFrame {
         }
 
     }
-    public void GetAllRooms(ArrayList<String> list){
+
+    public void GetAllRooms(ArrayList<String> list) {
         roomListChoice.removeAll();
         for (String listitem : list) {
             roomListChoice.add(listitem);
         }
-        
     }
-    
+
+    public void CompleteCreateAndEnter(Message msg) {
+        HashMap<String, ArrayList<String>> mess = (HashMap<String, ArrayList<String>>) (msg.content);
+        String key = mess.keySet().toArray()[0].toString();
+        ArrayList<String> users = mess.get(key);
+        Room newRoom = new Room();
+        newRoom.roomName = key;
+        newRoom.lbl_roomName.setText(key);
+        newRoom.username = txt_myusername.getText();
+        newRoom.updateParticipants(users);
+        newRoom.updateRoomChat(txt_myusername.getText() + " congratulations! You created a new room!");
+        newRoom.setVisible(true);
+        myChatRooms.add(newRoom);
+
+    }
+
+    public void EnterRoom(Message msg) {
+        ArrayList<String> elements = (ArrayList<String>) msg.content;
+        Room newRoom = new Room();
+        newRoom.roomName = elements.get(1);
+        newRoom.username = txt_myusername.getText();
+        newRoom.lbl_roomName.setText(elements.get(1));
+        newRoom.setVisible(true);
+        myChatRooms.add(newRoom);
+
+    }
+
+    public static void ChatRoomUserListAddNew(ArrayList<String> mess) {
+
+        for (Room r : myChatRooms) {
+            if (r.roomName.equals(mess.get(0))) {
+                r.dlmparticipants.addElement(mess.get(1));
+                r.list_participants.setModel(r.dlmparticipants);
+                break;
+            }
+        }
+
+    }
+
+    public void ChatRoomNewMsg(Message msg) {
+
+        String room = ((ArrayList<String>) msg.content).get(0);
+        String text = ((ArrayList<String>) msg.content).get(1);
+
+        for (Room r : myChatRooms) {
+            if (r.roomName.equals(room)) {
+                r.dlmChat.addElement(text);
+                r.list_room_chat.setModel(r.dlmChat);
+
+                break;
+            }
+        }
+
+    }
+
+    public void ChatSetRoomOldUsers(Message msg) {
+        String room = (String) ((ArrayList) msg.content).get(0);
+        ArrayList<String> userslist = (ArrayList<String>) ((ArrayList) msg.content).get(1);
+        System.out.println("list: "+userslist);
+        for (Room mcr : myChatRooms) {
+            if (mcr.roomName.equals(room)) {
+                for (String u : userslist) {
+                    mcr.dlmparticipants.addElement(u);
+                }
+                mcr.list_participants.setModel(mcr.dlmparticipants);
+                break;
+            }
+        }
+
+    }
+
+    public void ChatRoomParticipantLeft(Message msg) {
+        String room = (String) ((ArrayList) msg.content).get(0);
+        ArrayList<String> users = (ArrayList<String>) ((ArrayList) msg.content).get(1);
+        System.out.println("users:"+users);
+        for (Room mcr : myChatRooms) {
+            if (mcr.roomName.equals(room)) {
+                mcr.dlmparticipants = new DefaultListModel();
+                for (String u : users) {
+                            
+                    mcr.dlmparticipants.addElement(u);
+                }
+                mcr.list_participants.setModel(mcr.dlmparticipants);
+
+                break;
+            }
+        }
+
+    }
+
+    public void DellFromMyChatRooms(Message msg) {
+        String roomname = (String) msg.content;
+        int index = 0;
+        for (int i = 0; i < myChatRooms.size(); i++) {
+            if (myChatRooms.get(i).roomName.equals(roomname)) {
+                index = i;
+                break;
+            }
+        }
+        myChatRooms.remove(index);
+    }
 
     public void Reset() {
 
@@ -286,6 +391,7 @@ public class Login extends javax.swing.JFrame {
         getContentPane().add(txt_private_chat, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 110, 260, 170));
 
         btn_enterRoom.setText("Enter");
+        btn_enterRoom.setEnabled(false);
         btn_enterRoom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_enterRoomActionPerformed(evt);
@@ -327,6 +433,7 @@ public class Login extends javax.swing.JFrame {
         txt_myusername.setEnabled(false);
         btn_send_message.setEnabled(true);
         btn_dc.setEnabled(true);
+        btn_enterRoom.setEnabled(true);
         btn_newRoom.setEnabled(true);
     }//GEN-LAST:event_btn_connectActionPerformed
 
@@ -360,7 +467,8 @@ public class Login extends javax.swing.JFrame {
         // Disconnect butonuna basıldığında
         // Server'a ayrılacağı bildirisini yapar.
         // Server onu kullanıcı listesinden çıkartır ve threadlerini durdurur.
-        Message msg = new Message(Message.Message_Type.Disconnect);
+         if(myChatRooms.size()==0){
+            Message msg = new Message(Message.Message_Type.Disconnect);
         String x = txt_myusername.getText();
         msg.content = x;
         Client.Send(msg);
@@ -371,6 +479,10 @@ public class Login extends javax.swing.JFrame {
         btn_connect.setEnabled(true);
         txt_myusername.setEnabled(true);
         btn_newRoom.setEnabled(false);
+        btn_enterRoom.setEnabled(false);
+        }
+        
+       
     }//GEN-LAST:event_btn_dcActionPerformed
 
     private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
@@ -411,7 +523,7 @@ public class Login extends javax.swing.JFrame {
             txt_msg_private.setEnabled(true);
             btn_send_private.setEnabled(true);
 
-            if (selectedUserForPrvChat!=null && selectedUserForPrvChat.equals(lbltest.getText())) {
+            if (selectedUserForPrvChat != null && selectedUserForPrvChat.equals(lbltest.getText())) {
 
                 lbltest.setVisible(false);
                 lbltest2.setVisible(false);
@@ -423,25 +535,29 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_newRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_newRoomActionPerformed
         // TODO add your handling code here:
-       cr=new CreateRoom();
-       ArrayList<String> roomnames=new ArrayList<String>();
+        cr = new CreateRoom();
+        ArrayList<String> roomnames = new ArrayList<String>();
         for (int i = 0; i < roomListChoice.getItemCount(); i++) {
-            roomnames.add( roomListChoice.getItem(i));
+            roomnames.add(roomListChoice.getItem(i));
         }
-       
-       cr.username=txt_myusername.getText(); 
-       cr.rNames=roomnames;
-       cr.setVisible(true);
-       
-       
-       
-       
-       // String roomName=JOptionPane.showInputDialog(newRoomFrame,"Enter Room Name","Create New Room",3);
-        
+
+        cr.username = txt_myusername.getText();
+        cr.rNames = roomnames;
+        cr.setVisible(true);
+
+        // String roomName=JOptionPane.showInputDialog(newRoomFrame,"Enter Room Name","Create New Room",3);
+
     }//GEN-LAST:event_btn_newRoomActionPerformed
 
     private void btn_enterRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enterRoomActionPerformed
         // TODO add your handling code here:
+        if (roomListChoice.getSelectedItem() != null) {
+            String roomName = roomListChoice.getSelectedItem();
+            enterPass = new PassInputScreen();
+            enterPass.username = txt_myusername.getText();
+            enterPass.lbl_roomname.setText(roomName);
+            enterPass.setVisible(true);
+        }
     }//GEN-LAST:event_btn_enterRoomActionPerformed
 
     /**
