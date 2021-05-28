@@ -377,6 +377,19 @@ public class Server {
         
 
     }
+    
+    public static void SendReceivedFile(Message msg){
+        ArrayList elements=(ArrayList)msg.content;
+        int roomindex=findRoom(elements.get(0).toString());
+        Message newmsg2 = new Message(Message.Message_Type.FileTransfer);
+        newmsg2.content=elements;
+        for (SClient clt : Clients) {
+            if(chatRooms.get(roomindex).userListOfRoom.contains(clt.name)){
+                Server.Send(clt, newmsg2);
+            }
+        }
+    
+    }
 
     // serverdan clietlara mesaj gönderme
     //clieti alıyor ve mesaj olluyor

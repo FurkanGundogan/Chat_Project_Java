@@ -40,6 +40,7 @@ public class PassInputScreen extends javax.swing.JFrame {
         lbl_wrongpass = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         lbl_roomname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbl_roomname.setText("Room Name");

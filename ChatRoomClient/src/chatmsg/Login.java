@@ -17,6 +17,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -203,7 +209,7 @@ public class Login extends javax.swing.JFrame {
     public void ChatSetRoomOldUsers(Message msg) {
         String room = (String) ((ArrayList) msg.content).get(0);
         ArrayList<String> userslist = (ArrayList<String>) ((ArrayList) msg.content).get(1);
-        System.out.println("list: "+userslist);
+        System.out.println("list: " + userslist);
         for (Room mcr : myChatRooms) {
             if (mcr.roomName.equals(room)) {
                 for (String u : userslist) {
@@ -219,12 +225,12 @@ public class Login extends javax.swing.JFrame {
     public void ChatRoomParticipantLeft(Message msg) {
         String room = (String) ((ArrayList) msg.content).get(0);
         ArrayList<String> users = (ArrayList<String>) ((ArrayList) msg.content).get(1);
-        System.out.println("users:"+users);
+        System.out.println("users:" + users);
         for (Room mcr : myChatRooms) {
             if (mcr.roomName.equals(room)) {
                 mcr.dlmparticipants = new DefaultListModel();
                 for (String u : users) {
-                            
+
                     mcr.dlmparticipants.addElement(u);
                 }
                 mcr.list_participants.setModel(mcr.dlmparticipants);
@@ -245,6 +251,33 @@ public class Login extends javax.swing.JFrame {
             }
         }
         myChatRooms.remove(index);
+    }
+
+    public boolean roomExistanceControl(String roomName) {
+        boolean exist = false;
+        for (Room mcr : myChatRooms) {
+            if (mcr.roomName.equals(roomName)) {
+                exist = true;
+                break;
+            }
+        }
+        return exist;
+    }
+    public static void getReceivedFile(Message msg) throws IOException{
+        ArrayList elements=(ArrayList)msg.content;
+        for (Room mcr: myChatRooms) {
+            if(mcr.roomName.equals(elements.get(0))){
+                mcr.dlmChat.addElement("* "+elements.get(1)+" send a file: '"+elements.get(2)+"' *");
+                    mcr.list_room_chat.setModel(mcr.dlmChat);
+                if(!mcr.username.equals(elements.get(1))){
+                    byte[] content=(byte[])elements.get(3);   
+                    File fToDownload= new File("src/files/"+((String)elements.get(2)));
+                    Files.write(fToDownload.toPath(),content); 
+                break;
+                }
+                
+            }
+        }
     }
 
     public void Reset() {
@@ -299,6 +332,9 @@ public class Login extends javax.swing.JFrame {
         jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(1195, 450));
+        setPreferredSize(new java.awt.Dimension(1195, 450));
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -467,22 +503,22 @@ public class Login extends javax.swing.JFrame {
         // Disconnect butonuna basıldığında
         // Server'a ayrılacağı bildirisini yapar.
         // Server onu kullanıcı listesinden çıkartır ve threadlerini durdurur.
-         if(myChatRooms.size()==0){
+        if (myChatRooms.size() == 0) {
             Message msg = new Message(Message.Message_Type.Disconnect);
-        String x = txt_myusername.getText();
-        msg.content = x;
-        Client.Send(msg);
+            String x = txt_myusername.getText();
+            msg.content = x;
+            Client.Send(msg);
 
-        Client.Stop();
-        btn_dc.setEnabled(false);
-        btn_send_message.setEnabled(false);
-        btn_connect.setEnabled(true);
-        txt_myusername.setEnabled(true);
-        btn_newRoom.setEnabled(false);
-        btn_enterRoom.setEnabled(false);
+            Client.Stop();
+            btn_dc.setEnabled(false);
+            btn_send_message.setEnabled(false);
+            btn_connect.setEnabled(true);
+            txt_myusername.setEnabled(true);
+            btn_newRoom.setEnabled(false);
+            btn_enterRoom.setEnabled(false);
         }
-        
-       
+
+
     }//GEN-LAST:event_btn_dcActionPerformed
 
     private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
@@ -551,12 +587,14 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_enterRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enterRoomActionPerformed
         // TODO add your handling code here:
-        if (roomListChoice.getSelectedItem() != null) {
-            String roomName = roomListChoice.getSelectedItem();
-            enterPass = new PassInputScreen();
-            enterPass.username = txt_myusername.getText();
-            enterPass.lbl_roomname.setText(roomName);
-            enterPass.setVisible(true);
+        if (roomListChoice.getSelectedItem() != null && roomListChoice.getItemCount() > 0) {
+            if (!roomExistanceControl(roomListChoice.getSelectedItem())) {
+                String roomName = roomListChoice.getSelectedItem();
+                enterPass = new PassInputScreen();
+                enterPass.username = txt_myusername.getText();
+                enterPass.lbl_roomname.setText(roomName);
+                enterPass.setVisible(true);
+            }
         }
     }//GEN-LAST:event_btn_enterRoomActionPerformed
 

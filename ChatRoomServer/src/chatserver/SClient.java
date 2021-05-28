@@ -121,6 +121,9 @@ public class SClient {
                         case RoomUserLeft:
                             Server.SendUserLeftRoom(received);
                             break;
+                        case FileTransfer:
+                            Server.SendReceivedFile(received);
+                            break;
                         case Selected:
                             Server.Send(TheClient.rival, received);
                             break;

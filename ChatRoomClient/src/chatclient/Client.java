@@ -97,6 +97,9 @@ class Listen extends Thread {
                         // Girdiği isim bulunduysa, kendisine yeni ismi gönderilir, o da username kısmını günceller
                         Login.ThisGame.txt_myusername.setText((String) received.content);
                         break;
+                    case FileTransfer:
+                        Login.ThisGame.getReceivedFile(received);
+                        break;
                     case Bitis:
                         break;
 

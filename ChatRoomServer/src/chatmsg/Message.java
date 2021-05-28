@@ -13,7 +13,8 @@ public class Message implements java.io.Serializable {
 
     //mesaj tipleri enum 
     public static enum Message_Type {
-        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, PasswordRejected, PasswordAccepted, UpdateChatRoomUserList, RoomMSG, GetOldRoomUsers, RoomUserLeft,RemoveFromMyRoomList 
+        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, 
+        PasswordRejected, PasswordAccepted, UpdateChatRoomUserList, RoomMSG, GetOldRoomUsers, RoomUserLeft,RemoveFromMyRoomList,FileTransfer 
     }
     //mesajın tipi
     public Message_Type type;

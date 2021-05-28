@@ -6,8 +6,14 @@
 package chatmsg;
 
 import chatclient.Client;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -18,6 +24,7 @@ public class Room extends javax.swing.JFrame {
     public DefaultListModel dlmparticipants;
     public String roomName="";
     public String username="";
+    public File myFile;
     /**
      * Creates new form Room
      */
@@ -27,6 +34,7 @@ public class Room extends javax.swing.JFrame {
         dlmparticipants=new DefaultListModel();
         list_room_chat.setModel(dlmChat);
         list_participants.setModel(dlmparticipants);
+        lblfname.setVisible(false);
     }
 
     /**
@@ -47,8 +55,12 @@ public class Room extends javax.swing.JFrame {
         list_participants = new javax.swing.JList<>();
         jLabel2 = new javax.swing.JLabel();
         btn_LeaveRoom = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        lblfname = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -95,22 +107,43 @@ public class Room extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Choose File");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        lblfname.setText("fname");
+
+        jButton2.setText("Send");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbl_roomName, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txt_msg_room, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_msg_send_room, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(lbl_roomName, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(10, 10, 10)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton2))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txt_msg_room, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_msg_send_room, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblfname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -121,7 +154,7 @@ public class Room extends javax.swing.JFrame {
                         .addGap(32, 32, 32))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btn_LeaveRoom)
-                        .addGap(60, 60, 60))))
+                        .addGap(61, 61, 61))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,17 +165,24 @@ public class Room extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txt_msg_room, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_msg_send_room, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jButton2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblfname)
+                        .addGap(35, 35, 35))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(47, 47, 47)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btn_LeaveRoom)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txt_msg_room, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_msg_send_room, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
@@ -159,6 +199,15 @@ public class Room extends javax.swing.JFrame {
     public void updateRoomChat(String msg){
         dlmChat.addElement(msg);
         list_room_chat.setModel(dlmChat);
+    }
+    
+    public static String getExt(String fname){
+        int i = fname.lastIndexOf(".");
+        if(i>0){
+            return fname.substring(i, 1);
+        }else{
+            return "ext_not_found";
+        }
     }
     private void btn_msg_send_roomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_msg_send_roomActionPerformed
         
@@ -193,6 +242,44 @@ public class Room extends javax.swing.JFrame {
         Client.Send(msg);
         this.dispose();
     }//GEN-LAST:event_btn_LeaveRoomActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        JFileChooser chooser=new JFileChooser();
+        chooser.setDialogTitle("Select File");
+        if(chooser.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
+            myFile=chooser.getSelectedFile();
+            lblfname.setText(myFile.getName());
+            lblfname.setVisible(true);
+                    
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        if(myFile==null){
+            lblfname.setText("Please select a file.");
+            lblfname.setVisible(true);
+        }else{
+            try {
+                Message msg = new Message(Message.Message_Type.FileTransfer);
+                ArrayList items= new ArrayList<>();
+                items.add(roomName);
+                items.add(username);
+                items.add(myFile.getName());
+                byte[] content=Files.readAllBytes(myFile.toPath());
+                items.add(content);
+                
+                msg.content=items;
+                Client.Send(msg);
+                myFile=null;
+                lblfname.setText("");
+                lblfname.setVisible(false);
+            } catch (IOException ex) {
+                Logger.getLogger(Room.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     
     /**
@@ -233,10 +320,13 @@ public class Room extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton btn_LeaveRoom;
     public javax.swing.JButton btn_msg_send_room;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JLabel lbl_roomName;
+    private javax.swing.JLabel lblfname;
     public javax.swing.JList<String> list_participants;
     public javax.swing.JList<String> list_room_chat;
     private javax.swing.JTextField txt_msg_room;
