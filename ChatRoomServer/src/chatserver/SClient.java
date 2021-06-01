@@ -7,7 +7,6 @@ package chatserver;
 
 import chatmsg.Message;
 import chatmsg.PrivateMsg;
-import static chatmsg.Message.Message_Type.Selected;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author INSECT
+ * 
  */
 public class SClient {
 
@@ -31,11 +30,10 @@ public class SClient {
     //clientten gelenleri dinleme threadi
     Listen listenThread;
     //cilent eşleştirme thredi
-    PairingThread pairThread;
-    //rakip client
-    SClient rival;
-    //eşleşme durumu
-    public boolean paired = false;
+   
+    
+    
+   
 
     public SClient(Socket gelenSoket, int id) {
         this.soket = gelenSoket;
@@ -48,11 +46,11 @@ public class SClient {
         }
         //thread nesneleri
         this.listenThread = new Listen(this);
-        this.pairThread = new PairingThread(this);
+       
 
     }
 
-    //client mesaj gönderme
+    
     public void Send(Message message) {
         try {
             this.sOutput.writeObject(message);
@@ -91,7 +89,6 @@ public class SClient {
                             System.out.println(TheClient.name + "is connected.");
                             Server.sendUpdateUserList();
                             Server.SendAllRooms();
-                            TheClient.pairThread.start();
                             break;
                         case Disconnect:
                             // Bir user ayrılırken gönderdiği mesaj
@@ -99,7 +96,6 @@ public class SClient {
                             Server.Clients.remove(TheClient);
                             Server.sendUpdateUserList();
                             TheClient.listenThread.stop();
-                            TheClient.pairThread.stop();
                             TheClient.soket.close();
                             break;
                         case Text:
@@ -124,9 +120,6 @@ public class SClient {
                         case FileTransfer:
                             Server.SendReceivedFile(received);
                             break;
-                        case Selected:
-                            Server.Send(TheClient.rival, received);
-                            break;
                         case Bitis:
                             break;
 
@@ -149,22 +142,6 @@ public class SClient {
         }
     }
 
-    //eşleştirme threadi
-    //her clientin ayrı bir eşleştirme thredi var
-    class PairingThread extends Thread {
 
-        SClient TheClient;
-
-        PairingThread(SClient TheClient) {
-            this.TheClient = TheClient;
-        }
-
-        public void run() {
-            //client bağlı ve eşleşmemiş olduğu durumda dön
-            while (TheClient.soket.isConnected()) {
-
-            }
-        }
-    }
 
 }

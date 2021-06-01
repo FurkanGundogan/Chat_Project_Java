@@ -7,18 +7,18 @@ package chatmsg;
 
 /**
  *
- * @author INSECT
+ * 
  */
 public class Message implements java.io.Serializable {
 
-    //mesaj tipleri enum 
+    
     public static enum Message_Type {
-        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, 
+        None, Name, Disconnect, Text , Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, 
         PasswordRejected, PasswordAccepted, UpdateChatRoomUserList, RoomMSG, GetOldRoomUsers, RoomUserLeft,RemoveFromMyRoomList,FileTransfer 
     }
-    //mesajın tipi
+    
     public Message_Type type;
-    //mesajın içeriği obje tipinde ki istenilen tip içerik yüklenebilsin
+    
     public Object content;
 
     public Message(Message_Type t) {

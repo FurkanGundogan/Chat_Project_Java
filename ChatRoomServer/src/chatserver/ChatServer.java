@@ -8,7 +8,7 @@ package chatserver;
 
 /**
  *
- * @author INSECT
+ * 
  */
 public class ChatServer {
 

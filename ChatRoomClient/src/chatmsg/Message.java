@@ -7,12 +7,12 @@ package chatmsg;
 
 /**
  *
- * @author INSECT
+ * 
  */
 public class Message implements java.io.Serializable {
 
     public static enum Message_Type {
-        None, Name, Disconnect, RivalConnected, Text, Selected, Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, PasswordRejected,
+        None, Name, Disconnect , Text , Bitis, Start, UpdateUserList, Rename, PrivateMsg, CreateNewRoom, NewRoom, SendAllRooms, RoomNameExist, CompleteCreation, RequestJoinRoom, PasswordRejected,
         PasswordAccepted, UpdateChatRoomUserList, RoomMSG, GetOldRoomUsers, RoomUserLeft,RemoveFromMyRoomList,FileTransfer
     }
 

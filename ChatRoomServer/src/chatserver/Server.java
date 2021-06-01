@@ -20,7 +20,7 @@ import javax.swing.DefaultListModel;
 
 /**
  *
- * @author INSECT
+ * 
  */
 //client gelişini dinleme threadi
 class ServerThread extends Thread {
@@ -61,12 +61,12 @@ public class Server {
     public static int port = 0;
     //Serverı sürekli dinlemede tutacak thread nesnesi
     public static ServerThread runThread;
-    //public static PairingThread pairThread;
+   
 
     public static ArrayList<SClient> Clients = new ArrayList<>();
     public static ArrayList<ChatRoom> chatRooms = new ArrayList<>();
-    //semafor nesnesi
-    public static Semaphore pairTwo = new Semaphore(1, true);
+    
+    
 
     // başlaşmak için sadece port numarası veriyoruz
     public static void Start(int openport) {
@@ -391,8 +391,7 @@ public class Server {
     
     }
 
-    // serverdan clietlara mesaj gönderme
-    //clieti alıyor ve mesaj olluyor
+   
     public static void Send(SClient cl, Message msg) {
 
         try {

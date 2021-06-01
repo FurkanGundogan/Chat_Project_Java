@@ -35,23 +35,20 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
-/**
- *
- * @author INSECT
- */
+
 public class Login extends javax.swing.JFrame {
 
-    //framedeki komponentlere erişim için satatik oyun değişkeni
+   
     public static Login ThisGame;
     public CreateRoom cr;
     public PassInputScreen enterPass;
     public static ArrayList<Room> myChatRooms;
-    //ekrandaki resim değişimi için timer yerine thread
+   
     public Thread tmr_slider;
     public Thread roomCreation;
-    //karşı tarafın seçimi seçim -1 deyse seçilmemiş
-    public int RivalSelection = -1;
-    //benim seçimim seçim -1 deyse seçilmemiş
+   
+    
+  
     public int myselection = -1;
     public String selectedUserForPrvChat = "";
     HashMap<String, String> myPrivateChats = new HashMap<String, String>();
@@ -70,25 +67,15 @@ public class Login extends javax.swing.JFrame {
         lbltest2.setVisible(false);
         myChatRooms = new ArrayList<>();
         roomListChoice.add("Test");
-        // resimleri döndürmek için tread aynı zamanda oyun bitiminide takip ediyor
+        
         tmr_slider = new Thread(() -> {
             //soket bağlıysa dönsün
             while (Client.socket.isConnected()) {
                 try {
-                    //
+                    
                     Thread.sleep(100);
-                    //eğer ikisinden biri -1 ise resim dönmeye devam etsin sonucu göstermesin
-                    if (RivalSelection == -1 || myselection == -1) {
-
-                    }// eğer iki seçim yapılmışsa sonuç gösterilebilir.  
-                    else {
-
-                        Thread.sleep(4000);
-                        tmr_slider.stop();
-                        //7 saniye sonra oyun bitsin tekrar bağlansın
-                        Thread.sleep(7000);
-
-                    }
+               
+                    
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
                 }
