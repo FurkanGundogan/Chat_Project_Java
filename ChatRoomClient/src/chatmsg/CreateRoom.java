@@ -15,10 +15,10 @@ import java.util.ArrayList;
 public class CreateRoom extends javax.swing.JFrame {
 
     public String username="";
-    public boolean exitControl=false;
     public ArrayList<String> rNames=new ArrayList<String>();
     /**
-     * Creates new form CreateRoom
+     * 
+     * 
      */
     public CreateRoom() {
         initComponents();
@@ -127,7 +127,8 @@ public class CreateRoom extends javax.swing.JFrame {
 
     
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
-            if(txtrname.getText().equals("") || txtrpass.getText().equals("")){
+        // Oda oluşturmak icin servere bir nevi istek gonderiyor    
+        if(txtrname.getText().equals("") || txtrpass.getText().equals("")){
             lbl_Hata.setText("Plese fill the blanks");
             lbl_Hata.setVisible(true);
             }else{

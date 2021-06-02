@@ -13,7 +13,7 @@ public class PrivateMsg implements java.io.Serializable {
     private String sender;
     private String target;
     private String content;
-
+    // ozel mesaj nesnesi
     public PrivateMsg(String sender, String target, String content) {
         this.sender = sender;
         this.target = target;

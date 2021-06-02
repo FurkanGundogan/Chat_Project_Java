@@ -53,10 +53,12 @@ class Listen extends Thread {
                         Login.ThisGame.GetAllRooms((ArrayList<String>)received.content);                       
                         break;
                     case RoomNameExist:
+                        //Yeni room açmaya çalışılan sırada, eger o isimde bir oda daha varsa
                         Login.ThisGame.cr.lbl_Hata.setText((String)received.content);
                         Login.ThisGame.cr.lbl_Hata.setVisible(true);
                         break;
                     case CompleteCreation:
+                        //Serverden gelen: "sorunsuz bir şekilde odayı oluştur" mesajı
                         Login.ThisGame.cr.dispose();
                         Login.ThisGame.CompleteCreateAndEnter(received);
                         break;
@@ -64,6 +66,7 @@ class Listen extends Thread {
                         Login.ThisGame.enterPass.lbl_wrongpass.setVisible(true);
                         break;
                     case PasswordAccepted:
+                        // Dogru girilen mesaj sonrasi, odaya giris
                         Login.ThisGame.EnterRoom(received);
                         Login.ThisGame.enterPass.dispose();
                         break;

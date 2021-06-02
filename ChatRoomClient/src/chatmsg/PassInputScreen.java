@@ -124,7 +124,8 @@ public class PassInputScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_cancelpassActionPerformed
 
     private void btn_enterpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enterpassActionPerformed
-
+        // Bu ekrani acan kullanici icin, servere, odaya girme istegi atar
+        // sifre dogruya kabul edilecek
         if(txt_enterpass.getText()!=null && !txt_enterpass.getText().equals("")){
             String pass=txt_enterpass.getText();
              Message msg = new Message(Message.Message_Type.RequestJoinRoom);

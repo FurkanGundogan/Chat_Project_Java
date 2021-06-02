@@ -40,17 +40,23 @@ public class Login extends javax.swing.JFrame {
 
    
     public static Login ThisGame;
+    
+    //Yeni oda olusturma ekrani
     public CreateRoom cr;
+    
+    //Odaya girisi icin sifre girme paneli
     public PassInputScreen enterPass;
+    
+    //Kullanicinin dahil oldugu odalar
     public static ArrayList<Room> myChatRooms;
    
     public Thread tmr_slider;
-    public Thread roomCreation;
    
     
-  
-    public int myselection = -1;
+   //Ozel mesaj atmak icin listeden anlik kisi
     public String selectedUserForPrvChat = "";
+    
+    // KullaniciAdi-Mesaj  ikilisi şeklinde, bir mapte, mesajlasilan kullanicilarla olan sohbet saklaniyor
     HashMap<String, String> myPrivateChats = new HashMap<String, String>();
     Random rand;
 
@@ -95,19 +101,23 @@ public class Login extends javax.swing.JFrame {
 
                 if (selected.equals(uname)) {
                     list_all_users.setSelectedIndex(i);
-                    System.out.println(selected + "-" + uname + ":" + i);
+                    //Liste guncellenirken, o anda sohbet edilen kisi cikmadiya, onu set et ve sohbet bolunmesin
                     isChanged = false;
                     break;
                 }
             }
         }
         if (isChanged) {
+            //Liste guncellenirken, o anda sohbet edilen kisi ciktiysa ozel sohbet icin ilk elemani set et
             list_all_users.setSelectedIndex(0);
         }
+        
         createNewPrivateChat(dlm);
+        // Asagidaki fonk cagirilir
     }
 
     public void createNewPrivateChat(DefaultListModel dlm) {
+        // Listeyi guncellerken, yeni biri geldiyse, onunla yeni bir sohbet olustur, ici bos
         String username = (String) dlm.get(dlm.getSize() - 1);
         if (!myPrivateChats.containsKey(username)) {
             myPrivateChats.put(username, "");
@@ -116,6 +126,10 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void privateMsgReceived(PrivateMsg pmsg) {
+        // Gelen ozel mesaj incelenir
+        // o kisiyle olan sohbete mesaj eklenir
+        // listede o an o kisi seciliyse yani onunla sohbet ediliyorsa dlm guncellenir
+        // baska biriyle ediliyorsa, liste ustunde bildirim gosterir
         String oldMsgs = "";
         if (myPrivateChats.get(pmsg.getSender()) != null) {
             oldMsgs = myPrivateChats.get(pmsg.getSender());
@@ -133,6 +147,8 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void GetAllRooms(ArrayList<String> list) {
+        // Server, yeni oda kurulunca, SendAllRooms ile tum oda adlarini string arraylistte gonderir
+        // Tum kullanicilarin ekranindaki oda listesi guncellenir
         roomListChoice.removeAll();
         for (String listitem : list) {
             roomListChoice.add(listitem);
@@ -140,6 +156,9 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void CompleteCreateAndEnter(Message msg) {
+        // Severdaki addnewroom'un 2. fonku
+        // Odayi ilk acan kisi icin calisir
+        
         HashMap<String, ArrayList<String>> mess = (HashMap<String, ArrayList<String>>) (msg.content);
         String key = mess.keySet().toArray()[0].toString();
         ArrayList<String> users = mess.get(key);
@@ -155,6 +174,8 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void EnterRoom(Message msg) {
+        // Password kabul mesajı ile tetiklenir
+        // Mesaj olarak oda bilgileri gelir, bu bilgilerle yeni oda ekranı açılır
         ArrayList<String> elements = (ArrayList<String>) msg.content;
         Room newRoom = new Room();
         newRoom.roomName = elements.get(1);
@@ -166,7 +187,10 @@ public class Login extends javax.swing.JFrame {
     }
 
     public static void ChatRoomUserListAddNew(ArrayList<String> mess) {
-
+        // Bir kullanici, odaya girmek icin servere join istegi atiyor
+        // Server bu kullaniciyi kontrol ediyor, odada yoksa ve sifresi duzgunse onayliyor
+        // Diger kullanicilara OdaAdi-YeniKullaniciAdi ikilisinden olusan arraylist geliyor
+        // Her kullanici kendi odalari arasindan bu odayi kontrol ediyor, o oda adina sahip odada bulunanlar, guncelleme yapiyor
         for (Room r : myChatRooms) {
             if (r.roomName.equals(mess.get(0))) {
                 r.dlmparticipants.addElement(mess.get(1));
@@ -178,7 +202,9 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void ChatRoomNewMsg(Message msg) {
-
+        // Bir odadan atilan mesaj dogurultusunda Server bu mesajı alıyor odaadi-mesaj
+        // bu odanin uye listesinde olan tum kullanicilara bu mesaj gidiyor
+        // bu fonk ile mesaj ayristilirip ekranda gereken sekilde guncelleniyor
         String room = ((ArrayList<String>) msg.content).get(0);
         String text = ((ArrayList<String>) msg.content).get(1);
 
@@ -194,6 +220,9 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void ChatSetRoomOldUsers(Message msg) {
+        // İlk olarak yazilan update fonksiyonu: odadaki kullanicilar listesini sadece yeni gelen kullanici icin yapiyor
+        // Odaya katilan kisi de ancak kendisini odada goruyordu, bu guncelleme tum uyeleri kapsayacak sekilde tekrar yazildi
+        // Odaya girmek isteyen kullanici sifreyi dogru girdiyse, SendLastUserListToJoined ile tetikleniyor
         String room = (String) ((ArrayList) msg.content).get(0);
         ArrayList<String> userslist = (ArrayList<String>) ((ArrayList) msg.content).get(1);
         System.out.println("list: " + userslist);
@@ -210,9 +239,12 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void ChatRoomParticipantLeft(Message msg) {
+        // Bir uye ayrildiktan sonra
+        // Serverden gelen mesajla uye listesi guncellenir
+        // mesajda tum uye listesi vardir
         String room = (String) ((ArrayList) msg.content).get(0);
         ArrayList<String> users = (ArrayList<String>) ((ArrayList) msg.content).get(1);
-        System.out.println("users:" + users);
+        
         for (Room mcr : myChatRooms) {
             if (mcr.roomName.equals(room)) {
                 mcr.dlmparticipants = new DefaultListModel();
@@ -229,6 +261,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     public void DellFromMyChatRooms(Message msg) {
+        // Ayrildigi odayi, odalarindan siler
         String roomname = (String) msg.content;
         int index = 0;
         for (int i = 0; i < myChatRooms.size(); i++) {
@@ -241,6 +274,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     public boolean roomExistanceControl(String roomName) {
+        // daha sonra kullanmak icin boolean fonk
         boolean exist = false;
         for (Room mcr : myChatRooms) {
             if (mcr.roomName.equals(roomName)) {
@@ -251,6 +285,7 @@ public class Login extends javax.swing.JFrame {
         return exist;
     }
     public static void getReceivedFile(Message msg) throws IOException{
+        // Oda uzerinden gelen dosyanin kaydedilmesi
         ArrayList elements=(ArrayList)msg.content;
         for (Room mcr: myChatRooms) {
             if(mcr.roomName.equals(elements.get(0))){
@@ -510,7 +545,8 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_send_privateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_send_privateActionPerformed
         // TODO add your handling code here:
-
+        // Server uzerinden, listeden secilen kullaniciya, ozel mesaj gonderir
+        // PrivateMsg nesnesi
         String senderUsername = txt_myusername.getText();
         String targetUsername = list_all_users.getSelectedValue();
         String content = txt_msg_private.getText();
@@ -558,6 +594,7 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_newRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_newRoomActionPerformed
         // TODO add your handling code here:
+        // Yeni oda olusturma ekranı, mevcut odaların isimleri gonderilerek aciliyor
         cr = new CreateRoom();
         ArrayList<String> roomnames = new ArrayList<String>();
         for (int i = 0; i < roomListChoice.getItemCount(); i++) {
@@ -568,12 +605,13 @@ public class Login extends javax.swing.JFrame {
         cr.rNames = roomnames;
         cr.setVisible(true);
 
-        // String roomName=JOptionPane.showInputDialog(newRoomFrame,"Enter Room Name","Create New Room",3);
+        
 
     }//GEN-LAST:event_btn_newRoomActionPerformed
 
     private void btn_enterRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enterRoomActionPerformed
         // TODO add your handling code here:
+        // Bir odaya girmek icin, once sifre girme ekrani aciliyor
         if (roomListChoice.getSelectedItem() != null && roomListChoice.getItemCount() > 0) {
             if (!roomExistanceControl(roomListChoice.getSelectedItem())) {
                 String roomName = roomListChoice.getSelectedItem();

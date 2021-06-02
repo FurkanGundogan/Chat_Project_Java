@@ -62,8 +62,9 @@ public class Server {
     //Serverı sürekli dinlemede tutacak thread nesnesi
     public static ServerThread runThread;
    
-
+    // servere bagli kullanicilar
     public static ArrayList<SClient> Clients = new ArrayList<>();
+    // olusturulan odalar
     public static ArrayList<ChatRoom> chatRooms = new ArrayList<>();
     
     
@@ -133,12 +134,13 @@ public class Server {
     }
 
     public static void sendPrivate(Message msg) {
+        // Server'a gelen ozel mesaji, hedefe iletir
         PrivateMsg pmsg = (PrivateMsg) msg.content;
 
         for (SClient c : Clients) {
             if (c.name.equals(pmsg.getTarget())) {
                 Server.Send(c, msg);
-                System.out.println(c.name);
+                
                 break;
             }
 
@@ -147,6 +149,9 @@ public class Server {
     }
 
     public static void addNewRoom(Message msg) {
+        // yeni oda olusturma
+        // Ardindan tum kullanicilara oda listesi guncel haliyle gider
+        // odayi acan kullaniciya da tamamlama mesaji gonderilir
         String roomname = ((ArrayList<String>) msg.content).get(0);
         String roompass = ((ArrayList<String>) msg.content).get(1);
         String firstUser = ((ArrayList<String>) msg.content).get(2);
@@ -182,6 +187,7 @@ public class Server {
     }
 
     public static void SendCreationCompleteMsg(String name, ChatRoom r) {
+        // odayi acan kullanici icin tamamlama mesaji
         Message newmsg = new Message(Message.Message_Type.CompleteCreation);
         HashMap<String, ArrayList<String>> cnt = new HashMap<String, ArrayList<String>>();
         
@@ -197,7 +203,7 @@ public class Server {
     }
 
     public static void SendAllRooms() {
-
+        // oda listesi guncelleme durumunda cagrilan fonksiyon
         ArrayList<String> allroomnames = new ArrayList<>();
 
         for (ChatRoom c : chatRooms) {
@@ -250,7 +256,7 @@ public class Server {
     }
 
     public static void SendAcceptRoomJoin(String user, String roomname) {
-
+        // Password kontrolü sonrasi cagrilir. Gonderilen mesajla kullanici yeni odaya girer
         for (SClient c : Clients) {
             if (c.name.equals(user)) {
                 Message newmsg = new Message(Message.Message_Type.PasswordAccepted);
@@ -266,6 +272,7 @@ public class Server {
     }
 
     public static void SendRejectRoomJoin(String user) {
+        // Password kontrolü sonrasi cagrilir. Gonderilen mesajla kullaniciya hata gosterilir
         for (SClient c : Clients) {
             if (c.name.equals(user)) {
                 Message newmsg = new Message(Message.Message_Type.PasswordRejected);
@@ -295,7 +302,7 @@ public class Server {
     }
 
     public static void SendRoomMSG(Message msg) {
-
+        // mesajda belirtilen odadaki tum kullanicilara mesaj iletilir
         ArrayList<String> elements = (ArrayList<String>) msg.content;
         String room = elements.get(0);
         String text = elements.get(1);
@@ -320,7 +327,7 @@ public class Server {
     }
 
     public static void SendLastUserListToJoined(String user, String roomname, ArrayList<String> userList) {
-        
+        // odaya katilan son kullanici, user listesinin tamamini alir ve listesini gunceller
         for (SClient c : Clients) {
             if (c.name.equals(user)) {
                 Message newmsg = new Message(Message.Message_Type.GetOldRoomUsers);
@@ -339,6 +346,8 @@ public class Server {
     }
 
     public static void SendUserLeftRoom(Message msg) {
+        // oda listesinden uye silinir
+        // diger uyelere listelerini guncellemesi icin mesaj gonderilir
         String uname = ((ArrayList<String>) msg.content).get(0);
          
         String room = ((ArrayList<String>) msg.content).get(1);
@@ -349,7 +358,7 @@ public class Server {
         for (String el : arr) {
             arr2.add(el);
         }
-        System.out.println("diziyeni: "+arr2);
+        
         Message newmsg = new Message(Message.Message_Type.RoomUserLeft);
        
         
@@ -379,6 +388,7 @@ public class Server {
     }
     
     public static void SendReceivedFile(Message msg){
+        // Gonderilen dosyayi, odadaki tum userlara atar
         ArrayList elements=(ArrayList)msg.content;
         int roomindex=findRoom(elements.get(0).toString());
         Message newmsg2 = new Message(Message.Message_Type.FileTransfer);

@@ -25,6 +25,7 @@ public class Room extends javax.swing.JFrame {
     public String roomName="";
     public String username="";
     public File myFile;
+    // oda uzerinden gonderilecek dosya
     /**
      * Creates new form Room
      */
@@ -189,6 +190,8 @@ public class Room extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     public void updateParticipants(ArrayList<String> users){
+        // gelen mesaj dogrultusunda listeyi bastan dizer
+        // alttaki fonk icin bir nevi duzeltme
         dlmparticipants.removeAllElements();
         for (String user : users) {
             dlmparticipants.addElement(user);
@@ -197,6 +200,7 @@ public class Room extends javax.swing.JFrame {
         list_participants.setModel(dlmparticipants);
     }
     public void updateRoomChat(String msg){
+        // gelen mesajla listeye yeni user ekler
         dlmChat.addElement(msg);
         list_room_chat.setModel(dlmChat);
     }
@@ -210,7 +214,8 @@ public class Room extends javax.swing.JFrame {
         }
     }
     private void btn_msg_send_roomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_msg_send_roomActionPerformed
-        
+        // oda ici mesaj
+        // odaadi-gonderen seklinde servere gider
        String chatmsg=txt_msg_room.getText();
       
        
@@ -231,6 +236,8 @@ public class Room extends javax.swing.JFrame {
 
     private void btn_LeaveRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_LeaveRoomActionPerformed
         // TODO add your handling code here:
+        // odadan ayrilirken, servere bunu bildirir
+        // daha sonra diger kullanicilardan bu kisi, listelerinden kaldirilir
         dlmparticipants=new DefaultListModel();
         list_participants.setModel(dlmparticipants);
         Message msg = new Message(Message.Message_Type.RoomUserLeft);
@@ -245,6 +252,7 @@ public class Room extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        //filechooser buttonu
         JFileChooser chooser=new JFileChooser();
         chooser.setDialogTitle("Select File");
         if(chooser.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
@@ -257,6 +265,7 @@ public class Room extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        // dosya gonderme icerik+gonderen+odaadi
         if(myFile==null){
             lblfname.setText("Please select a file.");
             lblfname.setVisible(true);
