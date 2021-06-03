@@ -486,7 +486,9 @@ public class Login extends javax.swing.JFrame {
 
     private void btn_connectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_connectActionPerformed
 
-        Client.Start("127.0.0.1", 2000);
+        //Client.Start("127.0.0.1", 2000);
+        Client.Start("3.142.19.115", 2000);
+        
         btn_connect.setEnabled(false);
         txt_myusername.setEnabled(false);
         btn_send_message.setEnabled(true);
